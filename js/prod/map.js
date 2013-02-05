@@ -210,9 +210,6 @@ $(function() {
                         }
                 ];
 
-                // CREATE MAP CONTROL
-                var lays = LayerManager.getAllLayers('#map-control');
-
                 // TOGGLE
                 createControlButton(map_control_labels, $('#map-control'), function(){
                     LayerManager.show(window.currentYear || 2531, getCurrentLayers('#map-control'));

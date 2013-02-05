@@ -11,13 +11,20 @@ window.CreateLayerManager = function(group, activeLayers) {
         base_prefix = [],
         fallback_prefix_fn = function(prefix, comparator) {
 
-            prefix = ['2531', '2534', '2546', '2555'].sort().reverse();
-
+	   		// Extracting all cityPlan layers from SVG and collect year prefixes
+			_.each(group, function(v, k){
+				if(k.match('^(.*)-' + 'cityPlan' + '.*$')) {
+					prefix.push(k.substring(0,4));
+				}
+			});
+			
+			prefix.sort().reverse();
+    	
             var current_map_year = _.find(prefix, function(y){
                 return parseInt(y, 10) <= parseInt(comparator, 10);
             });
 
-            return (current_map_year || 2531).toString();
+            return (current_map_year || _.last(prefix)).toString();
         };
 
     manager.set_baseLayer = function(layers) {
@@ -69,8 +76,6 @@ window.CreateLayerManager = function(group, activeLayers) {
         // YEAR FOR ACCIDENT & SNAPPED YEAR FOR MAP-LAYOUT
         prefix_to_show = _.union(base_prefix, (year).toString(), fallback_prefix_fn([], year));
 
-        // prefix = [(year).toString(), "other", "all", (current_map_year || 2531).toString()];
-
         var items_to_show = _.filter(funcs, function(item, k) {
             return _(prefix_to_show).contains(item.year) && _.contains(layer_to_show, item.layer);
         });
@@ -95,34 +100,12 @@ window.CreateLayerManager = function(group, activeLayers) {
         });
     };
 
-    manager.getAllLayers = function() {
-        return _.clone(["accident", "พท-เกษตรกรรม", "อาศัย", "พท-อนุรักษ์", "อุตสาหกรรมคลังสินค้า", "ราชการ", "อุตสาหกรรมไม่ก่อมลพิษ", "พท-โล่งเพื่อนันทนาการ"]);
-    };
-
     return manager;
 
 }; // LAYER MNGR CREATER
 
 
 // Utility
-
-var snapYear = function(val) {
-  return _.find(["2520", "2523", "2529", "2531", "2534", "2535",
-                "2538", "2539", "2540", "2543", "2544", "2539",
-                "2551", "2553", "2549"].sort().reverse(), function(item) {
-    return item <= val;
-  });
-};
-
-// var showGraphGuide = function(currentYear) {
-//     var snapped = snapYear(currentYear);
-//     var selected_overlay = '#graph-overlay g[id^="'+ snapped +'"]';
-
-//     $('#graph-overlay').show();
-//     $('#graph-overlay g').hide();
-
-//     $(selected_overlay).show();
-// };
 
 window.buildincidentHTML = function(idx, type) {
     var splitterMap = { 'graph-Event' : ' ', 'graph-Accident': '/' };
